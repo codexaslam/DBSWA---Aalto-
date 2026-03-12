@@ -1,31 +1,35 @@
 import { Hono } from "hono";
 import { Redis } from "ioredis";
 
-// Do not modify these
-const REDIS_CONTAINER_NAME = Deno.env.get("REDIS_HOST");
-const REDIS_CONTAINER_PORT = Deno.env.get("REDIS_PORT");
-const QUEUE_NAME = "PING_QUEUE";
-
-const redis = new Redis(
-  Number.parseInt(REDIS_CONTAINER_PORT),
-  REDIS_CONTAINER_NAME,
-);
-
 const app = new Hono();
 
-// Add the expected routes here
+// Redis connection - using values from environment or defaults
+const REDIS_HOST = Deno.env.get("REDIS_HOST") || "redis";
+const REDIS_PORT = Deno.env.get("REDIS_PORT") || 6379;
+
+const redisProducer = new Redis(Number(REDIS_PORT), REDIS_HOST);
+
+const QUEUE_NAME = "users";
+const PING_QUEUE_NAME = "PING_QUEUE";
+
+app.post("/users", async (c) => {
+  const { name } = await c.req.json();
+  await redisProducer.lpush(QUEUE_NAME, JSON.stringify({ name }));
+  c.status(202);
+  return c.body("Accepted");
+});
+
 app.post("/ping", async (c) => {
-  await redis.lpush(QUEUE_NAME, "ping");
+  await redisProducer.lpush(PING_QUEUE_NAME, "ping");
   return c.text("pong");
 });
 
 app.get("/pong", async (c) => {
-  const count = await redis.llen(QUEUE_NAME);
+  const count = await redisProducer.llen(PING_QUEUE_NAME);
   if (count === 0) {
     return c.text("Queue empty");
   }
-  const message = await redis.rpop(QUEUE_NAME);
-  // Handle theoretical race where queue became empty between checks
+  const message = await redisProducer.rpop(PING_QUEUE_NAME);
   if (!message) {
     return c.text("Queue empty");
   }

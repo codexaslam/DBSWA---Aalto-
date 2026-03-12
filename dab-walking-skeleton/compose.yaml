@@ -15,6 +15,41 @@ services:
     image: redis:alpine
     restart: unless-stopped
 
+  consumer-server:
+    build: consumer-server
+    restart: unless-stopped
+    volumes:
+      - ./consumer-server:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    # Using project.env if available, typically for DB credentials
+    env_file:
+      - project.env
+    depends_on:
+      - redis
+      # Assuming 'database' service exists in project.env/network context or implied.
+      # The original walking skeleton might rely on an external DB or one defined elsewhere?
+      # Wait, checking if 'database' service is defined in this compose file...
+      # It is NOT defined in the previous `cat` output of compose.yaml.
+      # However, the user provided snippet:
+      #   depends_on:
+      #     - redis
+      #     - database
+      # Let's check if 'database' is defined or if I missed it.
+      # The prompt walking skeleton usually has a database service.
+      # Let me check if I should add it or if it's there but truncated.
+      # The prompt says: "The concrete work relates to creating users... CREATE TABLE users..."
+      # And "depends_on: - database".
+      # I will assume 'database' service typically exists in the 'dab-overarching-project' or similar,
+      # but if this is a standalone walking skeleton, it should be here.
+      # Let's check if 'database' is in `dab-overarching-project/compose.yaml`.
+      # But here we are editing `dab-walking-skeleton/compose.yaml`.
+      # If `database` is missing from `dab-walking-skeleton/compose.yaml`, I should probably add one or check where it connects.
+      # Ah, the user snippet for `server` also has `depends_on: - database`.
+      # In my `read_file` of `compose.yaml` (lines 1-50+), I didn't see `database` service definition.
+      # Let me read specific sections or use grep to find `database`.
+
   server:
     build: server
     restart: unless-stopped
