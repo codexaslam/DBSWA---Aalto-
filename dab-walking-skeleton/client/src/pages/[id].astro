@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+
+import Layout from "../layouts/Layout.astro";
+
+const { id } = Astro.params;
+const nextId = Number(id) + 1;
+---
+
+<Layout>
+  <p>Now at {id}.</p>
+  <a href={`/${nextId}`}>Next</a>
+</Layout>

@@ -1,9 +1,5 @@
 ---
-interface Props {
-  title?: string;
-}
-
-const { title = "My epic title" } = Astro.props;
+const { title = "Astro Application" } = Astro.props;
 ---
 
 <!doctype html>
@@ -16,12 +12,6 @@ const { title = "My epic title" } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
-    <nav>
-      <a href="/">Main page</a>
-      <a href="/about">About page</a>
-      <a href="/admin/">Admin page</a>
-    </nav>
-    <h1>{title}</h1>
     <slot />
   </body>
 </html>
