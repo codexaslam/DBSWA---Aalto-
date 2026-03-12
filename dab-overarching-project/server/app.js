@@ -1,8 +1,19 @@
 import { Hono } from "hono";
 import { cache } from "hono/cache";
+import { Redis } from "ioredis";
 import postgres from "postgres";
 
 const app = new Hono();
+
+let redis;
+if (Deno.env.get("REDIS_HOST")) {
+  redis = new Redis(
+    Number.parseInt(Deno.env.get("REDIS_PORT")),
+    Deno.env.get("REDIS_HOST"),
+  );
+} else {
+  redis = new Redis(6379, "redis");
+}
 
 const sql = postgres({
   host: Deno.env.get("POSTGRES_HOST") || "database",
@@ -40,5 +51,27 @@ app.get(
     return c.json(exercises);
   },
 );
+
+app.post("/api/exercises/:id/submissions", async (c) => {
+  const idParam = c.req.param("id");
+  const exerciseId = Number(idParam);
+  if (!idParam || isNaN(exerciseId)) {
+    return c.json({ error: "Invalid exercise ID" }, 400);
+  }
+
+  const { source_code } = await c.req.json();
+  if (!source_code) {
+    return c.json({ error: "Missing source_code" }, 400);
+  }
+
+  const [submission] =
+    await sql`INSERT INTO exercise_submissions (exercise_id, source_code)
+    VALUES (${exerciseId}, ${source_code})
+    RETURNING id`;
+
+  await redis.lpush("submissions", submission.id);
+
+  return c.json({ id: submission.id });
+});
 
 export default app;
