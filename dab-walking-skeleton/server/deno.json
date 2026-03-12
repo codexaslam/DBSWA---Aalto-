@@ -3,7 +3,8 @@
     "dev": "deno run --watch --allow-net app-run.js"
   },
   "imports": {
-    "hono": "npm:hono@4.0.0"
+    "hono": "npm:hono@4.0.0",
+    "ioredis": "npm:ioredis@^5.3.0"
   },
   "nodeModulesDir": "auto"
 }
