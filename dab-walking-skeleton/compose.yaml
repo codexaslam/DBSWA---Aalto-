@@ -1,15 +1,31 @@
 services:
+  traefik:
+    image: traefik:v3.3
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:8000"
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
   server:
     build: server
     restart: unless-stopped
     volumes:
       - ./server:/app
-    ports:
-      - 8000:8000
     deploy:
+      replicas: 5
       resources:
         limits:
-          cpus: "0.5"
+          cpus: "0.1"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server-router.entrypoints=web"
+      - "traefik.http.routers.server-router.rule=PathPrefix(`/`)"
+      - "traefik.http.services.server-service.loadbalancer.server.port=8000"
 
   client:
     build: client
