@@ -1,0 +1,13 @@
+---
+import { getCollection } from "astro:content";
+
+const recipes = await getCollection("recipes");
+recipes.sort((a, b) => a.data.title.length - b.data.title.length);
+---
+<ul>
+{recipes.map((recipe) => (
+  <li>
+    <a href={`/recipes/${recipe.id}`}>{recipe.data.title}</a>
+  </li>
+))}
+</ul>
