@@ -1,0 +1,22 @@
+{
+  "name": "client",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/svelte": "^5.0.0",
+    "@deno/astro-adapter": "^0.1.0",
+    "astro": "^5.1.5",
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0",
+    "prettier-plugin-astro": "^0.13.0"
+  }
+}

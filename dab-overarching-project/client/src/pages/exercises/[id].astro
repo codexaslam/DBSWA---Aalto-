@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+const { id } = Astro.params;
+import ExerciseChecker from "../../components/ExerciseChecker.svelte";
+---
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Exercise {id}</title>
+</head>
+<body>
+    <p>Exercise {id}</p>
+    <ExerciseChecker client:load />
+</body>
+</html>
