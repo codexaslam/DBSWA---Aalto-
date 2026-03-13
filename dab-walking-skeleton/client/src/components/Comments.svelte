@@ -1,20 +1,20 @@
 <script>
-  import { commentState } from "../states/commentState.svelte.js";
+  import { useCommentState } from "../states/commentState.svelte.js";
+  const commentState = useCommentState();
 
-  let newComment = $state('');
-
+  let comment = $state("");
   const addComment = () => {
-    if (newComment.trim() !== '') {
-      commentState.addComment(newComment);
-      newComment = '';
-    }
+    commentState.add(comment);
+    comment = "";
   };
 </script>
 
-<div>
-  <input type="text" bind:value={newComment} placeholder="Add a comment..." />
-  <button onclick={addComment}>Add</button>
-</div>
+<h2>Add comment</h2>
+
+<input type="text" bind:value={comment} /><br/>
+<button onclick={addComment}>Add comment</button>
+
+<h2>Comments</h2>
 
 <ul>
   {#each commentState.comments as comment}
