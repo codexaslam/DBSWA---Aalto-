@@ -1,13 +1,13 @@
 ---
+import LanguageList from "../components/LanguageList.svelte";
 ---
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Programming time!</title>
+    <title>Languages</title>
 </head>
 <body>
-    <p>Programming time!</p>
-    <a href="/exercises/1">Start</a>
+    <LanguageList client:only="svelte" />
 </body>
 </html>

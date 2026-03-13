@@ -52,6 +52,36 @@ app.get(
   },
 );
 
+app.get("/api/exercises/:id", async (c) => {
+  const idParam = c.req.param("id");
+  const id = Number(idParam);
+  if (!idParam || isNaN(id)) {
+    return new Response(null, { status: 404 });
+  }
+
+  const exercises =
+    await sql`SELECT id, title, description FROM exercises WHERE id = ${id}`;
+  if (exercises.length === 0) {
+    return new Response(null, { status: 404 });
+  }
+  return c.json(exercises[0]);
+});
+
+app.get("/api/submissions/:id/status", async (c) => {
+  const idParam = c.req.param("id");
+  const id = Number(idParam);
+  if (!idParam || isNaN(id)) {
+    return new Response(null, { status: 404 });
+  }
+
+  const submissions =
+    await sql`SELECT grading_status, grade FROM exercise_submissions WHERE id = ${id}`;
+  if (submissions.length === 0) {
+    return new Response(null, { status: 404 });
+  }
+  return c.json(submissions[0]);
+});
+
 app.post("/api/exercises/:id/submissions", async (c) => {
   const idParam = c.req.param("id");
   const exerciseId = Number(idParam);

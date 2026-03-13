@@ -22,10 +22,25 @@ services:
     env_file:
       - project.env
 
+  load-balancer:
+    image: traefik:v3.1
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "8000:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  client:
+    build: ./client
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.client.rule=PathPrefix(`/`)"
+
   server:
     build: ./server
-    ports:
-      - "8000:8000"
     environment:
       POSTGRES_HOST: database
       POSTGRES_USER: ${POSTGRES_USER}
@@ -39,12 +54,14 @@ services:
       - redis
     env_file:
       - project.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server.rule=PathPrefix(`/api`)"
+      - "traefik.http.services.server.loadbalancer.server.port=8000"
 
   grader:
     build: ./grader
     restart: on-failure
-    ports:
-      - "8001:8000"
     environment:
       POSTGRES_HOST: database
       POSTGRES_USER: ${POSTGRES_USER}
@@ -58,6 +75,13 @@ services:
       - redis
     env_file:
       - project.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grader-api.rule=PathPrefix(`/grader-api`)"
+      - "traefik.http.routers.grader-api.middlewares=grader-api-replacepath"
+      - "traefik.http.middlewares.grader-api-replacepath.replacePathRegex.regex=^/grader-api(.*)"
+      - "traefik.http.middlewares.grader-api-replacepath.replacePathRegex.replacement=/api$$1"
+      - "traefik.http.services.grader-api.loadbalancer.server.port=8000"
 
   redis:
     image: redis:7-alpine

@@ -1,7 +1,5 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import DogFacts from "../components/DogFacts.svelte";
 ---
 
-<Layout>
-  <a href="/1">Start</a>
-</Layout>
+<DogFacts client:only={"svelte"} />

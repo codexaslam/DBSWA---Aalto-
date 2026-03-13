@@ -1,15 +1,15 @@
 ---
 export const prerender = false;
 const { id } = Astro.params;
-import Exercise from "../../components/Exercise.svelte";
+import ExerciseList from "../../components/ExerciseList.svelte";
 ---
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Exercise {id}</title>
+    <title>Exercises</title>
 </head>
 <body>
-    <Exercise id={id} client:only="svelte" />
+    <ExerciseList id={id} client:only="svelte" />
 </body>
 </html>
