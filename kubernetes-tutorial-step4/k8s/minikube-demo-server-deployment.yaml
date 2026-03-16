@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minikube-demo-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minikube-demo-server
+  template:
+    metadata:
+      labels:
+        app: minikube-demo-server
+    spec:
+      containers:
+        - name: minikube-demo-server
+          image: minikube-demo-server:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: minikube-demo-configmap
+            - secretRef:
+                name: minikube-demo-secret
+          volumeMounts:
+            - mountPath: "/app/data"
+              name: minikube-demo-volume
+      volumes:
+        - name: minikube-demo-volume
+          persistentVolumeClaim:
+            claimName: minikube-demo-pvc

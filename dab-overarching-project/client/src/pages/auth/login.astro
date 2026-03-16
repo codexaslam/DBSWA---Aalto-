@@ -1,0 +1,16 @@
+---
+import Login from "../../components/Login.svelte";
+import UserNav from "../../components/UserNav.svelte";
+---
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+</head>
+<body>
+    <UserNav client:only="svelte" />
+    <h1>Login</h1>
+    <Login client:only="svelte" />
+</body>
+</html>

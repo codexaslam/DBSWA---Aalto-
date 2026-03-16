@@ -3,7 +3,29 @@ import { cache } from "hono/cache";
 import { Redis } from "ioredis";
 import postgres from "postgres";
 
+import { auth } from "./auth.js";
+
 const app = new Hono();
+
+app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
+
+app.use("/api/exercises/:id/submissions", async (c, next) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+  c.set("user", session.user.id);
+  return next();
+});
+
+app.use("/api/submissions/:id/status", async (c, next) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+  c.set("user", session.user.id);
+  return next();
+});
 
 let redis;
 if (Deno.env.get("REDIS_HOST")) {
@@ -74,12 +96,17 @@ app.get("/api/submissions/:id/status", async (c) => {
     return new Response(null, { status: 404 });
   }
 
+  const userId = c.get("user");
+
   const submissions =
-    await sql`SELECT grading_status, grade FROM exercise_submissions WHERE id = ${id}`;
+    await sql`SELECT grading_status, grade, user_id FROM exercise_submissions WHERE id = ${id} AND user_id = ${userId}`;
   if (submissions.length === 0) {
     return new Response(null, { status: 404 });
   }
-  return c.json(submissions[0]);
+  return c.json({
+    grading_status: submissions[0].grading_status,
+    grade: submissions[0].grade,
+  });
 });
 
 app.post("/api/exercises/:id/submissions", async (c) => {
@@ -94,9 +121,11 @@ app.post("/api/exercises/:id/submissions", async (c) => {
     return c.json({ error: "Missing source_code" }, 400);
   }
 
+  const userId = c.get("user");
+
   const [submission] =
-    await sql`INSERT INTO exercise_submissions (exercise_id, source_code)
-    VALUES (${exerciseId}, ${source_code})
+    await sql`INSERT INTO exercise_submissions (exercise_id, source_code, user_id)
+    VALUES (${exerciseId}, ${source_code}, ${userId})
     RETURNING id`;
 
   await redis.lpush("submissions", submission.id);

@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "run": "deno run --allow-net --allow-env app-run.js"
+  },
+  "imports": {
+    "hono": "npm:hono@3.12.11"
+  }
+}

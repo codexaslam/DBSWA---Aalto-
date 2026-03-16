@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minikube-demo-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minikube-demo-server
+  template:
+    metadata:
+      labels:
+        app: minikube-demo-server
+    spec:
+      containers:
+        - name: minikube-demo-server
+          image: minikube-demo-server:1.2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: 10m
+            limits:
+              cpu: 100m
+          envFrom:
+            - configMapRef:
+                name: minikube-demo-configmap
+            - secretRef:
+                name: minikube-demo-secret
+          env:
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: minikube-demo-database-cluster-app
+                  key: host
+                  optional: false
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: minikube-demo-database-cluster-app
+                  key: port
+                  optional: false
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: minikube-demo-database-cluster-app
+                  key: dbname
+                  optional: false
+            - name: PGUSERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: minikube-demo-database-cluster-app
+                  key: user
+                  optional: false
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minikube-demo-database-cluster-app
+                  key: password
+                  optional: false
+          volumeMounts:
+            - name: data-storage
+              mountPath: "/app/data"
+      volumes:
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: minikube-demo-pvc

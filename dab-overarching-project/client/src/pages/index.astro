@@ -1,5 +1,6 @@
 ---
 import LanguageList from "../components/LanguageList.svelte";
+import UserNav from "../components/UserNav.svelte";
 ---
 <html lang="en">
 <head>
@@ -8,6 +9,7 @@ import LanguageList from "../components/LanguageList.svelte";
     <title>Languages</title>
 </head>
 <body>
+    <UserNav client:only="svelte" />
     <LanguageList client:only="svelte" />
 </body>
 </html>

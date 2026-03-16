@@ -5,8 +5,19 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
     env_file:
       - project.env
+
+  lgtm:
+    image: grafana/otel-lgtm:latest
+    ports:
+      - "3000:3000"
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./lgtm-data:/data
 
   flyway:
     image: flyway/flyway:10.8.1-alpine
@@ -35,6 +46,10 @@ services:
 
   client:
     build: ./client
+    environment:
+      OTEL_SERVICE_NAME: client
+    env_file:
+      - project.env
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.client.rule=PathPrefix(`/`)"
@@ -42,6 +57,7 @@ services:
   server:
     build: ./server
     environment:
+      OTEL_SERVICE_NAME: server
       POSTGRES_HOST: database
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -63,6 +79,7 @@ services:
     build: ./grader
     restart: on-failure
     environment:
+      OTEL_SERVICE_NAME: grader
       POSTGRES_HOST: database
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

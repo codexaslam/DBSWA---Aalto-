@@ -1,0 +1,16 @@
+---
+import Register from "../../components/Register.svelte";
+import UserNav from "../../components/UserNav.svelte";
+---
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Register</title>
+</head>
+<body>
+    <UserNav client:only="svelte" />
+    <h1>Register</h1>
+    <Register client:only="svelte" />
+</body>
+</html>

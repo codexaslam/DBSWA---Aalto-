@@ -2,6 +2,7 @@
 export const prerender = false;
 const { id } = Astro.params;
 import ExerciseList from "../../components/ExerciseList.svelte";
+import UserNav from "../../components/UserNav.svelte";
 ---
 <html lang="en">
 <head>
@@ -10,6 +11,7 @@ import ExerciseList from "../../components/ExerciseList.svelte";
     <title>Exercises</title>
 </head>
 <body>
+    <UserNav client:only="svelte" />
     <ExerciseList id={id} client:only="svelte" />
 </body>
 </html>

@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "run": "deno run --allow-net --allow-env app-run.js"
+  },
+  "imports": {
+    "@hono/hono": "jsr:@hono/hono@4.6.5",
+    "postgres": "npm:postgres@3.4.5"
+  }
+}
