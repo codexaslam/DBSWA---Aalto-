@@ -4,6 +4,35 @@
     let text = $state("");
     let gradingStatus = $state(null);
     let grade = $state(null);
+    let prediction = $state(null);
+
+    let typingTimer = null;
+
+    const handleInput = () => {
+        clearTimeout(typingTimer);
+        
+        typingTimer = setTimeout(async () => {
+            if (!text) return;
+            try {
+                const res = await fetch("/inference-api/predict", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ exercise: id, code: text })
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.prediction !== undefined) {
+                        prediction = Math.round(data.prediction);
+                    }
+                }
+            } catch (e) {
+                // prediction failed, ignore
+            }
+        }, 500);
+    };
 
     const submit = async () => {
         gradingStatus = "pending";
@@ -40,8 +69,12 @@
     };
 </script>
 
-<textarea bind:value={text}></textarea>
+<textarea bind:value={text} oninput={handleInput}></textarea>
 <button onclick={submit}>Submit</button>
+
+{#if prediction !== null}
+    <p>Correctness estimate: {prediction}%</p>
+{/if}
 
 {#if gradingStatus !== null}
     <p>Grading status: {gradingStatus}</p>

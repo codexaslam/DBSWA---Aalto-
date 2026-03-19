@@ -54,6 +54,13 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.client.rule=PathPrefix(`/`)"
 
+  inference-api:
+    build: ./inference-api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.inference-api.rule=PathPrefix(`/inference-api`)"
+      - "traefik.http.services.inference-api.loadbalancer.server.port=8000"
+
   server:
     build: ./server
     environment:
